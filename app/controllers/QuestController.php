@@ -19,7 +19,8 @@ class QuestController extends \BaseController {
 	 */
 	public function create()
 	{
-	    //
+	    $characters = Character::all();
+	    return View::make('quest.edit')->with(array('characters' => $characters, 'edit' => false));
 	}
 
 	/**
@@ -29,7 +30,33 @@ class QuestController extends \BaseController {
 	 */
 	public function store()
 	{
-		//
+		$rules = array(
+		     'date' => 'required|date_format:Y-m-d',
+		);
+		foreach(Input::get('experience') as $key => $value) {
+		     $rules['experience.'.$key] = 'required|numeric';
+		}
+		$input = Input::all();
+		
+		$validator = Validator::make($input, $rules);
+		
+	    if ($validator->fails()) {
+		dd($validator->messages());
+		    return Redirect::back()
+			     ->with('flash_message', 'Please fill in all fields.')
+			     ->withInput(Input::all())
+				 ->withErrors($validator);
+		}
+		else {
+		foreach ($input['experience'] as $key => $value) {
+		     $syncValues[$key] = array('experience' => $value);
+		}
+		    $quest = new Quest;
+            $quest->date = $input['date'];
+			$quest->save();
+            $quest->characters()->sync($syncValues);
+            return Redirect::intended('/')->with('flash_message', 'Quest Created.');		
+		}
 	}
 
 	/**
@@ -52,8 +79,8 @@ class QuestController extends \BaseController {
 	 */
 	public function edit($id)
 	{
-		$character = Character::find($id);
-		return View::make('character.edit')->with('character', $character)->with('edit', true);
+		$quest = Quest::find($id);
+		return View::make('quest.edit')->with('quest', $quest)->with('edit', true);
 	}
 
 	/**
@@ -64,33 +91,32 @@ class QuestController extends \BaseController {
 	 */
 	public function update($id)
 	{
-	    $rules = array(
-		     'name' => 'required',
-		     'race' => 'required',
+			$rules = array(
+		     'date' => 'required|date_format:Y-m-d',
 		);
+		foreach(Input::get('experience') as $key => $value) {
+		     $rules['experience.'.$key] = 'required|numeric';
+		}
 		$input = Input::all();
 		
 		$validator = Validator::make($input, $rules);
 		
 	    if ($validator->fails()) {
+		dd($validator->messages());
 		    return Redirect::back()
 			     ->with('flash_message', 'Please fill in all fields.')
 			     ->withInput(Input::all())
 				 ->withErrors($validator);
 		}
 		else {
-		    if (isset($input['active'])) {
-         	     $active = true;
-            }
-            else {
-			     $active = false;
-		    } 			
-		    $character = Character::with('quests')->find($id);
-            $character->name = $input['name'];
-            $character->race = $input['race'];
-			$character->active = $active;
-            $character->save();
-            return Redirect::intended('/')->with('flash_message', 'Character Updated.');		
+		foreach ($input['experience'] as $key => $value) {
+		     $syncValues[$key] = array('experience' => $value);
+		}
+		    $quest = Quest::find($id);
+            $quest->date = $input['date'];
+			$quest->save();
+            $quest->characters()->sync($syncValues);
+            return Redirect::intended('/')->with('flash_message', 'Quest Updated.');		
 		}
 	}
 
@@ -102,10 +128,10 @@ class QuestController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-        $character = Character::find($id);
-		$character->quests()->detach();
-		$character->delete();
-		return Redirect::intended('/')->with('flash_message', 'Character Deleted.');
+        $quest = Quest::find($id);
+		$quest->characters()->detach();
+		$quest->delete();
+		return Redirect::intended('/')->with('flash_message', 'Quest Deleted.');
 	}
 
 }

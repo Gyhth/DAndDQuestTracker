@@ -20,4 +20,7 @@ Route::get('/character/delete/{id}', array('as' => 'character.destroy', 'uses' =
 Route::post('/character/create', array('as' => 'character.store', 'uses' => 'CharacterController@store'));
 Route::get('/quest/show/{id}', array('as' => 'quest.show', 'uses' => 'QuestController@show'));
 Route::get('/quest/create/', array('as' => 'quest.create', 'uses' => 'QuestController@create'));
+Route::post('/quest/create/', array('as' => 'quest.store', 'uses' => 'QuestController@store'));
 Route::get('/quest/edit/{id}', array('as' => 'quest.edit', 'uses' => 'QuestController@edit'));
+Route::post('/quest/edit/{id}', array('as' => 'quest.update', 'uses' => 'QuestController@update'));
+Route::get('/quest/delete/{id}', array('as' => 'quest.destroy', 'uses' => 'QuestController@destroy'));

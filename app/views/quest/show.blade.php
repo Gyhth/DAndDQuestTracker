@@ -11,5 +11,5 @@
 <tr><td colspan="2">No Characters</td></tr>
 @endif 
 </table>
-<a href="{{URL::Action('CharacterController@destroy', [$character->id]) }}">Delete Character</a>
+<a href="{{URL::Action('QuestController@destroy', [$quest->id]) }}">Delete Quest</a>
 @stop
